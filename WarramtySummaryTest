@@ -1,0 +1,13 @@
+@isTest
+public class WarramtySummaryTest {
+    
+   @isTest static void createCase() {
+    	Case cas = new Case();
+    	cas.origin                         = 'email';
+    	cas.ownerId                        = '0056A000002FjdD';
+    	cas.Product_Purchase_Date__c       = Date.today();
+    	cas.Product_Total_Warranty_Days__c = 10;
+    	cas.Has_Extended__c                = true;
+        insert cas;
+   }
+}

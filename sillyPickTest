@@ -1,0 +1,11 @@
+@isTest
+public class sillyPickTest {
+    
+   @isTest static void createAccount() {
+    	Account myAccount = new Account();
+      myAccount.Name = 'Rob'
+      myAccount.sillyPick[0].value = 'Red';
+      myAccount.sillyPick[1].value = 'White';
+      myAccount.sillyPick[2].value = 'Blue';
+   }
+}

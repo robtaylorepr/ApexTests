@@ -1,0 +1,43 @@
+@isTest
+private class MaxCasesTEst {
+
+  @isTest static void noCasesToday() {
+    Contact myContact = new Contact();
+    myContact.LastName = 'Snow'
+    insert myContact;
+
+    Case myCase = new Case();
+    myCase.ContactId = myContact.Id;
+    myCase.Status = 'New';
+    insert myCase;
+
+    Case updatedCase = [SELECT Status
+                          FROM Case
+                         WHERE Id = :myCase.Id];
+    System.assertEquals('New', updatedCase.Status);
+  }
+
+  @isTest static void threeCasesTodayOnContact() {
+    Contact myContact = new Contact();
+    myContact.LastName = 'Snow';
+    insert myContact;
+
+    List<Case> oldCases = new List<Case>();
+    for (Integer i=0; i<2; i++) {
+      Case oldCase = new Case();
+      oldCase.ContackId = myContact.Id;
+      oldCases.add(oldCase);
+    }
+    insert oldCases;
+
+    Case myCase         = new Case();
+    myCase.ContactId = myContact.Id;
+    insert myCase;
+
+    Case updatedCase = [SELECT Status
+                         FROM  Case
+                        WHERE  Id = :myCase.Id];
+    System.assertEquals('Closed', updatedCase.Status);
+  }
+
+}

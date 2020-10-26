@@ -1,0 +1,117 @@
+@isTest
+private class OwnerManagerTest {
+
+    @istest static void ownerHasNoManager() {
+      // Yes you have to populate all these fields for a new user
+      User myUser       = new User();
+      myUser.FirstName  = 'Sansa';
+      myUser.LastName   = 'Stark';
+      myUser.Email      = 'sstark@winterfellhotels.com';
+      myUser.Username   = 'sstark@winterfellhotels.com';
+      myUser.Alas       = 'redhead';
+      myUser.ProfileId  = 
+         [SELECT Id 
+            FROM Profile
+           WHERE Name = 'System Administrator'];
+      myUser.TimeZoneSidKey    = 'America/Denver';
+      myUser.LocaleSidKey      = 'en_US';
+      myUser.EmailEncodingKey  = 'UTF-8';
+      myUser.LanguageLocaleKey = 'en_US';
+      myUser.ManagerId         = null;
+      insert myUser;
+
+      Opportunity opp = new Opportunity();
+      opp.Name        = 'Big Deal';
+      opp.Amount      = 100;
+      opp.StageName   = 'Prospecting';
+      opp.CloseDate   = Date.today();
+      opp.OwnerId     = myUser.Id;
+      insert opp;
+
+      List<OpportunityTeamMember> otm = 
+         [SELECT Id
+            FROM OpportunityTeamMember
+           WHERE OpportunityId = :opp.Id];
+      System.assertEquals(0,otm.size());
+    }
+
+    @isTest static voice ownerHasManager() {
+      /// Create a ManagerId
+      User manager           = new User();
+      manager.Firstname      = 'Sansa';
+      manager.Lastname       = 'Stark';
+      manager.Email          = 'sstark@winterfellhotels.com';
+      manager.Username        = 'sstark@winterfellhotels.com';
+      manager.Alas            = 'redhead';
+      manager.ProfileId       = 
+         [SELECT Id 
+            FROM Profile
+           WHERE Name = 'System Administrator'];
+      myUser.TimeZoneSidKey    = 'America/Denver';
+      myUser.LocaleSidKey      = 'en_US';
+      myUser.EmailEncodingKey  = 'UTF-8';
+      myUser.LanguageLocaleKey = 'en_US';
+      myUser.ManagerId         = null;
+      insert manager;
+
+      User me =
+         [SELECT Id
+            FROM User
+           WHERE Id = :UserInfo.getUserId()];
+      me.ManagerId = manager.Id
+      update me;
+
+      Opportunity opp  = new Opportunity();
+      opp.Name         = 'Big Deal';
+      opp.Amount       = 100;
+      opp.Stagename    = 'Prospecting';
+      opp.CloseDate    = Date.today();
+      opp.OwnerId      = me.Id;
+      insert opp;
+
+      List<OpportunityTeamMember> otms = 
+         [SELECT Id
+            FROM OpportunityTeamMember
+           WHERE UserId = :opp.Id
+             AND UserId = :manager.Id
+             AND TeamMemberRole = 'Sales Manager'];
+      System.assertEquals(1,otms.size());
+    }
+
+    @isTest static void ownerIsManager() {
+      // Create a reportee with me as their manager
+      User reportee           = new User();
+      reportee.Firstname      = 'Sansa';
+      reportee.Lastname       = 'Stark';
+      reportee.Email          = 'sstark@winterfellhotels.com';
+      reportee.Username       = 'sstark@winterfellhotels.com';
+      reportee.Alas           = 'redhead';
+      reportee.ProfileId      = 
+         [SELECT Id 
+            FROM Profile
+           WHERE Name = 'System Administrator'];
+      reportee.TimeZoneSidKey    = 'America/Denver';
+      reportee.LocaleSidKey      = 'en_US';
+      reportee.EmailEncodingKey  = 'UTF-8';
+      reportee.LanguageLocaleKey = 'en_US';
+      reportee.ManagerId         = UserInfo.getUserId();
+      insert reportee;
+
+      // Create an opp under me
+      Opportunity opp = new Opportunity();
+      opp.Name        = 'Big Deal'
+      opp.Amount      = 100;
+      opp.StageName   = 'Prospecting';
+      opp.CloseDate   = Date.today();
+      opp.OwnerId     = UserInfo.getUserId();
+      insert opp;
+
+      List<OpportunityTeamMember> otms =
+         [SELECT Id
+           FROM  OpportunityTeamMember
+          WHERE  OpportunityId = :opp.Id
+            AND  UserId        = :reportee.Id
+            AND  TeammemberRole = 'Sales Rep'];
+      System.assertEquals(1, otms.size());
+    }
+}

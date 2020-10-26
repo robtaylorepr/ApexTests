@@ -1,0 +1,12 @@
+@isTest
+private class disqualifyTestLeadTest {
+    
+   @isTest static void createLead() {
+    	Load myLead = new Lead();
+      myLoad.Compnay    = 'Not Provided';
+    	myLead.FirstName  = 'fred';
+    	myLead.LastName   = 'Test';
+    	myLead.Name       = 'fred Test';
+      insert myLead;
+   }
+}
